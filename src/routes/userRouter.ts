@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import UserController from "../controllers/userController";
 
 class UserRouter {
     public router: express.Router;
@@ -9,7 +10,9 @@ class UserRouter {
     }
 
     private createRoutes(): void {
-        this.router.get("/", (req: Request, res: Response) => res.send("Hello User"));
+        this.router.get("/", UserController.indexGet);
+        this.router.post("/new", UserController.userValidationChain, UserController.register);
+        this.router.get("/:id", UserController.profileGet);
     }
 }
 
