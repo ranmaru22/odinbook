@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 Hello World!
+
+  form(action="/user/new", method="POST")
+    input#name(type="text", name="name")
+    input#email(type="email", name="email")
+    input#password(type="password", name="password")
+    input#confirmPassword(type="password", name="confirmPassword")
+    button(type="submit") Submit
+
+  if errors
+    for error in errors
+      p= error.msg

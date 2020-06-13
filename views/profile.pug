@@ -1,0 +1,10 @@
+extends layout
+
+block content
+
+  unless notFound
+    h1 #{user.name}'s Profile
+    p No content yet. :)
+
+  else
+    h1 Profile not found. :(
