@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import mongoose from "mongoose";
 import session from "express-session";
@@ -11,7 +11,7 @@ import IndexRouter from "./routes/indexRouter";
 import UserRouter from "./routes/userRouter";
 
 import User, { IUser } from "./models/user";
-import StatusUpdate, { IStatusUpdate } from "./models/statusUpdate";
+import Post, { IPost } from "./models/post";
 
 class App {
     public express: express.Application;
@@ -23,7 +23,7 @@ class App {
     constructor() {
         this.express = express();
         this.port = process.env.PORT ? Number(process.env.PORT) : 3000;
-        this.express.set("views", path.join(__dirname, "views"));
+        this.express.set("views", path.join(__dirname, "../views"));
         this.express.set("view engine", "pug");
         this.express.set("port", this.port);
         // Define database
@@ -34,7 +34,7 @@ class App {
         this.setupPassport();
         this.express.use(express.urlencoded({ extended: false }));
         this.express.use(cookieParser());
-        this.express.use(express.static(path.join(__dirname, "public")));
+        this.express.use(express.static(path.join(__dirname, "../public")));
         this.express.use(this.passUserObject);
         // Define routes
         this.indexRouter = IndexRouter;
@@ -57,12 +57,9 @@ class App {
                 if (!user) {
                     return done(null, false, { msg: "User not found." });
                 } else {
-                    const passwordMatch = await bcrypt.compare(password, user.password);
-                    if (passwordMatch) {
-                        return done(null, user);
-                    } else {
-                        return done(null, false, { msg: "Incorrect password. " });
-                    }
+                    return await bcrypt.compare(password, user.password)
+                        ? done(null, user)
+                        : done(null, false, { msg: "Incorrect password. " });
                 }
             } catch (err) {
                 return done(err);
@@ -92,13 +89,15 @@ class App {
         this.express.use("/user", this.userRouter);
     }
 
-    private passUserObject(req: express.Request, res: express.Response, next: express.NextFunction): void {
+    private passUserObject(req: Request, res: Response, next: NextFunction): void {
         res.locals.currentUser = req.user;
         next();
     }
 
-    private errorHandler(err: Error, req: express.Request, res: express.Response, next: express.NextFunction): express.Response {
-        return res.status(400).json({ status: 400, data: null, msg: err.message });
+    private errorHandler(err: Error, req: Request, res: Response, next?: NextFunction): void {
+        res.locals.message = err.message;
+        res.locals.error = err;
+        res.status(500).render("error");
     }
 }
 
