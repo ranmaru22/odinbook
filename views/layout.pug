@@ -6,22 +6,31 @@ html(lang="en")
     link(rel="stylesheet", href="/css/bulma.min.css")
     link(rel="stylesheet", href="/css/animation.css")
     script(defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js")
+    script(defer src="/js/helpers.js")
     title Odinbook
 
   body
 
-    nav.navbar.is-fixed-top.is-1
-      .navbar-brand
-        a.navbar-item(href="/") Odinbook
-      .navbar-item
-        if locals.currentUser
-          p Hello, 
-            a(href=locals.currentUser.url) #{locals.currentUser.name}
-            | ! (
-            a(href="/users/logout") Logout
-            | )
-        else
-          p Not logged in.
+    header
+      nav.navbar.is-fixed-top.has-background-primary.has-shadow
+        .navbar-brand
+          a.navbar-item.has-text-weight-bold(href="/") Odinbook
+          a.navbar-burger.burger(role="button", data-target="navbarContent")
+            span
+            span
+            span
+        .navbar-menu#navbarContent
+          .navbar-start
+          .navbar-end
+            .navbar-item
+              if locals.currentUser
+                p Hello, 
+                  a(href=locals.currentUser.url) #{locals.currentUser.name}
+                  | ! (
+                  a(href="/users/logout") Logout
+                  | )
+              else
+                p Not logged in.
 
     main.section.mt-6
       block content
