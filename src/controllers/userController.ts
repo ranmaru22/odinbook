@@ -56,7 +56,7 @@ export default class UserController {
                 const savedUser = await user.save();
                 const profile = new Profile({ owner: savedUser });
                 await profile.save();
-                return res.redirect(savedUser.url);
+                return res.redirect(307, "/user/login");
             }
         } catch (err) {
             return next(err);
