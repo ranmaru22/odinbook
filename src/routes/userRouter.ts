@@ -14,7 +14,7 @@ class UserRouter {
     private createRoutes(): void {
         this.router.get("/", auth.protectRoute, UserController.indexGet);
         this.router.post("/login", passport.authenticate("local", {
-            successRedirect: "/",
+            successRedirect: "/user",
             failureRedirect: "/"
         }));
         this.router.get("/logout", (req: Request, res: Response, next: NextFunction) => {
