@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
+import auth from "../services/auth";
 import UserController from "../controllers/userController";
 
 class UserRouter {
@@ -11,9 +12,7 @@ class UserRouter {
     }
 
     private createRoutes(): void {
-        this.router.get("/", UserController.indexGet);
-        this.router.post("/new", UserController.userValidationChain, UserController.register);
-        this.router.get("/:id", UserController.profileGet);
+        this.router.get("/", auth.protectRoute, UserController.indexGet);
         this.router.post("/login", passport.authenticate("local", {
             successRedirect: "/",
             failureRedirect: "/"
@@ -22,6 +21,8 @@ class UserRouter {
             req.logout();
             res.redirect("/");
         });
+        this.router.post("/new", auth.protectRoute, UserController.userValidationChain, UserController.register);
+        this.router.get("/:id", auth.protectRoute, UserController.profileGet);
     }
 }
 
