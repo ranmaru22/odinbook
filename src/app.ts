@@ -9,9 +9,9 @@ import cookieParser from "cookie-parser";
 
 import IndexRouter from "./routes/indexRouter";
 import UserRouter from "./routes/userRouter";
+import PostsRouter from "./routes/postsRouter";
 
 import User, { IUser } from "./models/user";
-import Post, { IPost } from "./models/post";
 
 class App {
     public express: express.Application;
@@ -92,6 +92,7 @@ class App {
     private mountRoutes(): void {
         this.express.use("/", IndexRouter);
         this.express.use("/user", UserRouter);
+        this.express.use("/posts", PostsRouter);
     }
 
     private passUserObject(req: Request, res: Response, next: NextFunction): void {
