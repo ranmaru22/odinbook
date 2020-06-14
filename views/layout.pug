@@ -4,13 +4,24 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="/css/bulma.min.css")
+    link(rel="stylesheet", href="/css/animation.css")
     script(defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js")
     title Odinbook
 
   body
-    nav
-      h1.navbar-item
-        a(href="/") Odinbook
 
-    main.container
+    nav.navbar.is-fixed-top.is-1
+      .navbar-brand
+        a.navbar-item(href="/") Odinbook
+      .navbar-item
+        if locals.currentUser
+          p Hello, 
+            a(href=locals.currentUser.url) #{locals.currentUser.name}
+            | ! (
+            a(href="/users/logout") Logout
+            | )
+        else
+          p Not logged in.
+
+    main.section.mt-6
       block content
