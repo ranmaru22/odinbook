@@ -3,6 +3,7 @@ import * as validator from "express-validator";
 import bcrypt from "bcrypt";
 
 import User, { IUser } from "../models/user";
+import Profile, { IProfile } from "../models/profile";
 
 /*
  * GET / - Own profile, same as GET /<yourId>
@@ -53,6 +54,8 @@ export default class UserController {
                     password: passHash
                 });
                 const savedUser = await user.save();
+                const profile = new Profile({ owner: savedUser });
+                await profile.save();
                 return res.redirect(savedUser.url);
             }
         } catch (err) {
@@ -63,11 +66,11 @@ export default class UserController {
     static async profileGet(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.params.id).exec();
-            // TODO: find profile
             if (!user) {
                 res.status(404).render("profile", { notFound: true });
             } else {
-                res.render("profile", { user: user });
+                const profile = await Profile.findOne({ owner: user });
+                res.render("profile", { user: user, profile: profile });
             }
         } catch (err) {
             return next(err);
