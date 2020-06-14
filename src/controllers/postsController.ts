@@ -39,13 +39,22 @@ export default class PostsController {
                         { $push: { posts: savedPost } }
                     );
                     if (success.nModified === 0) {
-                        await savedPost.remove();
+                        await Post.findOneAndRemove(savedPost).exec();
                     }
                 }
                 return res.redirect("back");
             }
         } catch (err) {
             return next(err);
+        }
+    }
+
+    static async deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            await Post.findByIdAndDelete(req.params.id).exec();
+            res.redirect("back");
+        } catch (err) {
+
         }
     }
 }
