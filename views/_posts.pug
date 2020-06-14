@@ -1,6 +1,7 @@
 mixin post(post)
   .box
-    p #[strong #{post.author.name}] 
+    p
+      a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
     p= post.text
     .columns
@@ -19,6 +20,7 @@ mixin post(post)
 
 mixin reply(post)
   .container.mt-4
-    p #[strong #{post.author.name}] 
+    p 
+      a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
     p= post.text
