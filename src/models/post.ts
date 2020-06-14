@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import moment from "moment";
 import { IUser } from "./user";
 
 export interface IPost extends mongoose.Document {
@@ -20,10 +21,23 @@ const postSchema = new mongoose.Schema<IPost>({
 
 postSchema.virtual("replies", {
     ref: "Post",
+    foreignField: "parent",
     localField: "_id",
-    foreinField: "parent"
+    options: { sort: { "dateposted": -1 } }
 });
 
-const postModel = mongoose.model<IPost>("Post", postSchema);
+postSchema.virtual("replyCount", {
+    ref: "Post",
+    foreignField: "parent",
+    localField: "_id",
+    count: true
+});
+
+postSchema.virtual("datepostedRelative")
+    .get(function (this: IPost): string {
+        return moment(this.dateposted).fromNow();
+    });
+
+export const postModel = mongoose.model<IPost>("Post", postSchema);
 
 export default postModel;
