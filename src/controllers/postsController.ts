@@ -54,7 +54,7 @@ export default class PostsController {
             await Post.findByIdAndDelete(req.params.id).exec();
             res.redirect("back");
         } catch (err) {
-
+            return next(err);
         }
     }
 }
