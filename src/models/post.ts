@@ -33,6 +33,9 @@ postSchema.virtual("replyCount", {
     count: true
 });
 
+postSchema.virtual("url")
+    .get((function (this: IPost): string { return `/posts/${this._id}` }));
+
 postSchema.virtual("datepostedRelative")
     .get(function (this: IPost): string {
         return moment(this.dateposted).fromNow();
