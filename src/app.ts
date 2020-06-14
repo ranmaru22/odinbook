@@ -17,31 +17,26 @@ class App {
     public express: express.Application;
     public port: number;
     private db: mongoose.Connection;
-    private indexRouter: express.Router;
-    private userRouter: express.Router;
 
     constructor() {
         this.express = express();
         this.port = process.env.PORT ? Number(process.env.PORT) : 3000;
-        this.express.set("views", path.join(__dirname, "../views"));
-        this.express.set("view engine", "pug");
-        this.express.set("port", this.port);
+        this.setupExpress();
         // Define database
         this.db = this.setupDatabase();
         this.db.on("error", console.error.bind(console, "MongoDB connection error"));
         // Define middleware
-        this.express.use(session({ secret: process.env.SESSION_SECRET as string, resave: true, saveUninitialized: true }));
-        this.setupPassport();
-        this.express.use(express.urlencoded({ extended: false }));
-        this.express.use(cookieParser());
-        this.express.use(express.static(path.join(__dirname, "../public")));
-        this.express.use(this.passUserObject);
+        this.setupMiddleware();
         // Define routes
-        this.indexRouter = IndexRouter;
-        this.userRouter = UserRouter;
         this.mountRoutes();
         // Define error handler
         this.express.use(this.errorHandler);
+    }
+
+    private setupExpress(): void {
+        this.express.set("views", path.join(__dirname, "../views"));
+        this.express.set("view engine", "pug");
+        this.express.set("port", this.port);
     }
 
     private setupDatabase(): mongoose.Connection {
@@ -51,20 +46,21 @@ class App {
     }
 
     private defineStrategy(): passportLocal.Strategy {
-        return new passportLocal.Strategy(async (email: string, password: string, done: Function) => {
-            try {
-                const user = await User.findOne({ email: email });
-                if (!user) {
-                    return done(null, false, { msg: "User not found." });
-                } else {
-                    return await bcrypt.compare(password, user.password)
-                        ? done(null, user)
-                        : done(null, false, { msg: "Incorrect password. " });
+        return new passportLocal.Strategy({ usernameField: "email", passwordField: "password" },
+            async (email: string, password: string, done: Function) => {
+                try {
+                    const user = await User.findOne({ email: email }).exec();
+                    if (!user) {
+                        return done(null, false, { msg: "User not found." });
+                    } else {
+                        return await bcrypt.compare(password, user.password)
+                            ? done(null, user)
+                            : done(null, false, { msg: "Incorrect password." });
+                    }
+                } catch (err) {
+                    return done(err);
                 }
-            } catch (err) {
-                return done(err);
-            }
-        });
+            });
     }
 
     private setupPassport(): void {
@@ -74,7 +70,7 @@ class App {
         });
         passport.deserializeUser(async (id: string, done: Function) => {
             try {
-                const user = User.findById(id);
+                const user = await User.findById(id).exec();
                 done(null, user);
             } catch (err) {
                 done(err);
@@ -84,9 +80,18 @@ class App {
         this.express.use(passport.session());
     }
 
+    private setupMiddleware(): void {
+        this.express.use(session({ secret: process.env.SESSION_SECRET as string, resave: true, saveUninitialized: true }));
+        this.setupPassport();
+        this.express.use(express.urlencoded({ extended: false }));
+        this.express.use(cookieParser());
+        this.express.use(express.static(path.join(__dirname, "../public")));
+        this.express.use(this.passUserObject);
+    }
+
     private mountRoutes(): void {
-        this.express.use("/", this.indexRouter);
-        this.express.use("/user", this.userRouter);
+        this.express.use("/", IndexRouter);
+        this.express.use("/user", UserRouter);
     }
 
     private passUserObject(req: Request, res: Response, next: NextFunction): void {
