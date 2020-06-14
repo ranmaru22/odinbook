@@ -1,5 +1,9 @@
 mixin post(post)
   .box
+    if post.author.equals(locals.currentUser)
+      form(action="/posts/" + post._id, method="POST")
+        input(type="hidden", name="_method", value="DELETE")
+        button.delete.is-pulled-right(type="submit")
     p
       a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
@@ -20,6 +24,10 @@ mixin post(post)
 
 mixin reply(post)
   .container.mt-4
+    if post.author.equals(locals.currentUser)
+      form(action="/posts/" + post._id, method="POST")
+        input(type="hidden", name="_method", value="DELETE")
+        button.delete.is-pulled-right(type="submit")
     p 
       a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
