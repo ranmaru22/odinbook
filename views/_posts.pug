@@ -1,0 +1,24 @@
+mixin post(post)
+  .box
+    p #[strong #{post.author.name}] 
+      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+    p= post.text
+    .columns
+      .column
+        form(action="/posts/new", method="POST")
+          input(type="hidden", name="parentpost" value=post._id)
+          .field.has-addons
+            .control.is-expanded
+              input.input.is-small#post(name="post", rows="1", placeholder="Reply")
+            .control
+              button.button.is-info.is-small(type="submit") Submit
+    .container.is-size-7
+      p #{post.replyCount} #{post.replyCount === 1 ? "reply" : "replies"}.
+      for reply in post.replies
+        +reply(reply)
+
+mixin reply(post)
+  .container.mt-4
+    p #[strong #{post.author.name}] 
+      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+    p= post.text
