@@ -3,11 +3,12 @@ import * as validator from "express-validator";
 import bcrypt from "bcrypt";
 
 import User, { IUser } from "../models/user";
+import Post, { IPost } from "../models/post";
 import Profile, { IProfile } from "../models/profile";
 
 /*
- * GET / - Own profile, same as GET /<yourId>
- * POST / - Add a new user
+* GET / - Own profile, same as GET /<yourId>
+* POST / - Add a new user
  * GET /:id - Profile of some user
  * PATCH /:id - Update profile
  * DELETE /:id - Delete profile
@@ -69,7 +70,18 @@ export default class UserController {
             if (!user) {
                 res.status(404).render("profile", { notFound: true });
             } else {
-                const profile = await Profile.findOne({ owner: user });
+                const profile = await Profile
+                    .findOne({ owner: user })
+                    .populate({
+                        path: "posts",
+                        populate: [
+                            { path: "author", select: "name" },
+                            { path: "replies", populate: { path: "author", select: "name" } },
+                            { path: "replyCount" },
+                        ],
+                        options: { sort: { "dateposted": -1 } }
+                    })
+                    .exec();
                 res.render("profile", { user: user, profile: profile });
             }
         } catch (err) {
