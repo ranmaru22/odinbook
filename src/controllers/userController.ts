@@ -37,8 +37,17 @@ export default class UserController {
             })
     ];
 
-    static indexGet(req: Request, res: Response): Response {
-        return res.send("Hello User");
+    static async indexGet(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findById((req.user as IUser)._id).exec();
+            if (user) {
+                res.redirect(user.url);
+            } else {
+                res.redirect("/");
+            }
+        } catch (err) {
+            return next(err);
+        }
     }
 
     static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
