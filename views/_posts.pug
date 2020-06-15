@@ -2,15 +2,18 @@ mixin post(post)
   .box
     .container.mb-3
       if post.author.equals(locals.currentUser)
+        // Delete form
         form(action="/posts/" + post._id, method="POST")
           input(type="hidden", name="_method", value="DELETE")
           button.delete.is-pulled-right(type="submit")
+
       p
         a(href=post.author.url) #[strong #{post.author.name}] 
         | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
       p= post.text
 
     .buttons
+      // Like form
       form(action="/posts/" + post._id, method="POST")
         input(type="hidden", name="_method", value="PATCH")
         input(type="hidden", name="_query", value="like")
@@ -21,6 +24,7 @@ mixin post(post)
 
     .columns
       .column
+        // Reply form
         form(action="/posts/new", method="POST")
           input(type="hidden", name="parentpost" value=post._id)
           .field.has-addons
@@ -30,17 +34,30 @@ mixin post(post)
               button.button.is-info.is-small(type="submit") Submit
 
     .container.is-size-7
-      p #{post.replyCount} #{post.replyCount === 1 ? "reply" : "replies"}.
-      for reply in post.replies
-        +reply(reply)
+      p 
+        a(id=("t_" + post._id), onClick=`hideReplies("` + post._id + `")`) [-] 
+        | #{post.replyCount} #{post.replyCount === 1 ? "reply" : "replies"}.
+      .container(id=("r_" + post._id))
+        for reply in post.replies
+          +reply(reply)
 
 mixin reply(post)
-  .container.mt-4
+  hr.my-2
+  .container
     if post.author.equals(locals.currentUser)
+      // Delete form
       form(action="/posts/" + post._id, method="POST")
         input(type="hidden", name="_method", value="DELETE")
         button.delete.is-pulled-right(type="submit")
-    p 
-      a(href=post.author.url) #[strong #{post.author.name}] 
-      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+    .container
+      // Like form
+      form(action="/posts/" + post._id, method="POST")
+        input(type="hidden", name="_method", value="PATCH")
+        input(type="hidden", name="_query", value="like")
+        a(href=post.author.url) #[strong #{post.author.name}] 
+        | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+        button.button.is-small.link-button.has-text-grey.ml-2(type="submit")
+          span.icon.is-small
+            i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
+          span #{post.likes}
     p= post.text
