@@ -12,8 +12,14 @@ export interface IProfile extends mongoose.Document {
 const profileSchema = new mongoose.Schema({
     owner: { type: mongoose.Types.ObjectId, ref: "User", required: true, unique: true },
     picture: { type: String },
-    status: { type: String },
-    posts: [{ type: mongoose.Types.ObjectId, ref: "Post" }]
+    status: { type: String }
+});
+
+profileSchema.virtual("posts", {
+    ref: "Post",
+    foreignField: "author",
+    localField: "owner",
+    match: { parent: { $exists: false } }
 });
 
 const profileModel = mongoose.model<IProfile>("Profile", profileSchema);
