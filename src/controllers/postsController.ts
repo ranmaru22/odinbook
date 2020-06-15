@@ -24,10 +24,9 @@ export default class PostsController {
             if (!validationErrors.isEmpty()) {
                 return res.redirect(400, "back");
             } else {
-                const author = await User.findById(req.user).exec();
                 const post = new Post({
                     text: req.body.post,
-                    author: author
+                    author: req.user
                 });
                 if (req.body.parentpost) {
                     post.parent = req.body.parentpost;
@@ -39,7 +38,7 @@ export default class PostsController {
                         { $push: { posts: savedPost } }
                     );
                     if (success.nModified === 0) {
-                        await Post.findOneAndRemove(savedPost).exec();
+                        await Post.findOneAndRemove(savedPost);
                     }
                 }
                 return res.redirect("back");
@@ -51,7 +50,7 @@ export default class PostsController {
 
     static async deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            await Post.findByIdAndDelete(req.params.id).exec();
+            const x = await Post.findByIdAndRemove(req.params.id).exec();
             res.redirect("back");
         } catch (err) {
             return next(err);
