@@ -41,7 +41,27 @@ export default class PostsController {
 
     static async deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const x = await Post.findOneAndDelete({ _id: req.params.id }).exec();
+            await Post.findOneAndDelete({ _id: req.params.id }).exec();
+            res.redirect("back");
+        } catch (err) {
+            return next(err);
+        }
+    }
+
+    static async likePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const post = await Post.findOne({ _id: req.params.id }).exec();
+            console.log(post?.likedBy);
+            if (post?.likedBy?.indexOf((req.user as IUser)._id) === -1) {
+                console.log("LIKE++");
+                await Post.updateOne(post!, { $push: { likedBy: req.user as IUser } });
+                console.log(post?.likedBy);
+            } else {
+                console.log("LIKE--");
+                await Post.updateOne(post!, { $pull: { likedBy: (req.user as IUser)._id } });
+                console.log(post?.likedBy);
+            }
+            await post?.save();
             res.redirect("back");
         } catch (err) {
             return next(err);
