@@ -15,9 +15,9 @@ namespace Auth {
 
     export async function confirmOwnerPost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const post = await Post.findById(req.params.id).exec();
+            const post = await Post.findById(req.params.id).populate("author").exec();
             if ((post?.author as mongoose.Document).equals(req.user as mongoose.Document)) {
-                next()
+                next();
             } else {
                 res.redirect("back");
             }
@@ -28,9 +28,9 @@ namespace Auth {
 
     export async function confirmOwnerProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const profile = await Profile.findById(req.params.id).exec();
+            const profile = await Profile.findById(req.params.id).populate("owner").exec();
             if ((profile?.owner as mongoose.Document).equals(req.user as mongoose.Document)) {
-                next()
+                next();
             } else {
                 res.redirect("back");
             }
