@@ -1,14 +1,24 @@
 mixin post(post)
   .box
-    if post.author.equals(locals.currentUser)
+    .container.mb-3
+      if post.author.equals(locals.currentUser)
+        form(action="/posts/" + post._id, method="POST")
+          input(type="hidden", name="_method", value="DELETE")
+          button.delete.is-pulled-right(type="submit")
+      p
+        a(href=post.author.url) #[strong #{post.author.name}] 
+        | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+      p= post.text
+
+    .buttons
       form(action="/posts/" + post._id, method="POST")
-        input(type="hidden", name="_method", value="DELETE")
-        button.delete.is-pulled-right(type="submit")
-    p
-      a(href=post.author.url) #[strong #{post.author.name}] 
-      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
-    p= post.text
-    p.is-size-7.has-text-grey.py-1 #{post.likes} #{post.likes === 1 ? "like" : "likes"}.
+        input(type="hidden", name="_method", value="PATCH")
+        input(type="hidden", name="_query", value="like")
+        button.button.is-small.is-rounded(type="submit")
+          span.icon.is-small
+            i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
+          span #{post.likes}
+
     .columns
       .column
         form(action="/posts/new", method="POST")
@@ -18,6 +28,7 @@ mixin post(post)
               input.input.is-small#post(name="post", rows="1", placeholder="Reply")
             .control
               button.button.is-info.is-small(type="submit") Submit
+
     .container.is-size-7
       p #{post.replyCount} #{post.replyCount === 1 ? "reply" : "replies"}.
       for reply in post.replies
