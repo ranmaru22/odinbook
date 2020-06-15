@@ -7,8 +7,8 @@ export interface IUser extends mongoose.Document {
     password: string;
     joindate: Date;
     friends?: IUser[] | string[];
-    friendRequests?: IUser[] | string[];
-    likedPosts?: IPost[] | string[];
+    sentFriendRequests?: IUser[] | string[];
+    recvFriendRequests?: IUser[] | string[];
     url: string;
     posts: IPost[] | string[];
 }
@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema<IUser>({
     password: { type: String, required: true },
     joindate: { type: Date, default: Date.now },
     friends: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-    friendRequests: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-    likedPosts: [{ type: mongoose.Types.ObjectId, ref: "Post" }],
+    sentFriendRequests: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+    recvFriendRequests: [{ type: mongoose.Types.ObjectId, ref: "User" }]
 });
 
 userSchema.virtual("url")

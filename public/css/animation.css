@@ -1,0 +1,9 @@
+.a-slide-open {
+  width             : 130px;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition        : width 0.4s ease-in-out;
+}
+
+.a-slide-open:focus {
+  width: 100%;
+}
