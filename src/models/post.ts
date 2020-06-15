@@ -8,6 +8,7 @@ export interface IPost extends mongoose.Document {
     likes: number;
     dateposted: Date;
     parent?: IPost | string;
+    replies?: IPost[] | string[];
     url: string;
 }
 
@@ -17,6 +18,19 @@ const postSchema = new mongoose.Schema<IPost>({
     likes: { type: Number, default: 0 },
     dateposted: { type: Date, default: Date.now },
     parent: { type: mongoose.Types.ObjectId, ref: "Post" }
+});
+
+postSchema.pre("findOneAndDelete", async function (this: IPost, next: mongoose.HookNextFunction): Promise<void> {
+    try {
+        const post = await postModel.findOne(this).populate("replies").exec();
+        post?.replies?.forEach(async (child: any) => {
+            await postModel.findOneAndDelete({ _id: child._id });
+        });
+    } catch (err) {
+        console.error(err);
+    } finally {
+        next();
+    }
 });
 
 postSchema.virtual("replies", {
