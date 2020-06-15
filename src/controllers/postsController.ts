@@ -41,7 +41,7 @@ export default class PostsController {
 
     static async deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const x = await Post.findByIdAndRemove(req.params.id).exec();
+            const x = await Post.findOneAndDelete({ _id: req.params.id }).exec();
             res.redirect("back");
         } catch (err) {
             return next(err);
