@@ -32,15 +32,6 @@ export default class PostsController {
                     post.parent = req.body.parentpost;
                 }
                 const savedPost = await post.save();
-                if (req.body.profileId) {
-                    const success = await Profile.updateOne(
-                        { _id: req.body.profileId, owner: req.user },
-                        { $push: { posts: savedPost } }
-                    );
-                    if (success.nModified === 0) {
-                        await Post.findOneAndRemove(savedPost);
-                    }
-                }
                 return res.redirect("back");
             }
         } catch (err) {
