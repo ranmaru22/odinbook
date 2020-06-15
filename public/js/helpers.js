@@ -12,3 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+const hideReplies = postId => {
+    document.querySelector(`#r_${postId}`).classList.toggle("is-hidden");
+    const clickBox = document.querySelector(`#t_${postId}`);
+    clickBox.textContent = clickBox.textContent === "[+] " ? "[-] " : "[+] ";
+}
