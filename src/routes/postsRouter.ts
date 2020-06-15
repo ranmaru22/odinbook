@@ -11,8 +11,19 @@ class IndexRouter {
     }
 
     private createRoutes(): void {
-        this.router.get("/", PostsController.index);
+        this.router.get("/", auth.protectRoute, PostsController.index);
         this.router.post("/new", auth.protectRoute, PostsController.postValidationChain, PostsController.newPost);
+        this.router.post("/:id", auth.protectRoute, auth.confirmOwnerPost, this.methodHandler, PostsController.index);
+
+    }
+
+    private methodHandler(req: Request, res: Response, next: NextFunction): void {
+        if (req.body._method === "DELETE") {
+            req.method = "DELETE";
+            PostsController.deletePost(req, res, next);
+        } else {
+            next();
+        }
     }
 }
 
