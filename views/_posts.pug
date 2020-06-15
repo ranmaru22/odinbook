@@ -8,6 +8,7 @@ mixin post(post)
       a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
     p= post.text
+    p.is-size-7.has-text-grey.py-1 #{post.likes} #{post.likes === 1 ? "like" : "likes"}.
     .columns
       .column
         form(action="/posts/new", method="POST")
