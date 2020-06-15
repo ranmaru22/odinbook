@@ -16,7 +16,6 @@ export interface IPost extends mongoose.Document {
 const postSchema = new mongoose.Schema<IPost>({
     text: { type: String, required: true, minlength: 3 },
     author: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-    likes: { type: Number, default: 0 },
     likedBy: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     dateposted: { type: Date, default: Date.now },
     parent: { type: mongoose.Types.ObjectId, ref: "Post" }
@@ -34,6 +33,11 @@ postSchema.pre("findOneAndDelete", async function (this: IPost, next: mongoose.H
         next();
     }
 });
+
+postSchema.virtual("likes")
+    .get(function (this: IPost): number {
+        return this.likedBy?.length ?? 0;
+    });
 
 postSchema.virtual("replies", {
     ref: "Post",
