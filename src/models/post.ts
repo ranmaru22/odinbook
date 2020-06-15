@@ -6,6 +6,7 @@ export interface IPost extends mongoose.Document {
     text: string;
     author: IUser | string;
     likes: number;
+    likedBy?: IUser[] | string[];
     dateposted: Date;
     parent?: IPost | string;
     replies?: IPost[] | string[];
@@ -16,6 +17,7 @@ const postSchema = new mongoose.Schema<IPost>({
     text: { type: String, required: true, minlength: 3 },
     author: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     likes: { type: Number, default: 0 },
+    likedBy: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     dateposted: { type: Date, default: Date.now },
     parent: { type: mongoose.Types.ObjectId, ref: "Post" }
 });
