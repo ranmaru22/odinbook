@@ -49,15 +49,14 @@ mixin reply(post)
       form(action="/posts/" + post._id, method="POST")
         input(type="hidden", name="_method", value="DELETE")
         button.delete.is-pulled-right(type="submit")
-    .container
-      // Like form
-      form(action="/posts/" + post._id, method="POST")
-        input(type="hidden", name="_method", value="PATCH")
-        input(type="hidden", name="_query", value="like")
-        a(href=post.author.url) #[strong #{post.author.name}] 
-        | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
-        button.button.is-small.link-button.has-text-grey.ml-2(type="submit")
-          span.icon.is-small
-            i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
-          span #{post.likes}
+    // Like form
+    form(action="/posts/" + post._id, method="POST")
+      input(type="hidden", name="_method", value="PATCH")
+      input(type="hidden", name="_query", value="like")
+      a(href=post.author.url) #[strong #{post.author.name}] 
+      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+      button.button.is-small.link-button.has-text-grey.ml-2(type="submit")
+        span.icon.is-small
+          i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
+        span #{post.likes}
     p= post.text
