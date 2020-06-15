@@ -21,6 +21,14 @@ class IndexRouter {
         if (req.body._method === "DELETE") {
             req.method = "DELETE";
             PostsController.deletePost(req, res, next);
+        } else if (req.body._method === "PATCH") {
+            req.method = "PATCH";
+            switch (req.body._query) {
+                case "like":
+                    PostsController.likePost(req, res, next);
+                    break;
+                default: next();
+            }
         } else {
             next();
         }
