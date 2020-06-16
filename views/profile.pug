@@ -4,30 +4,55 @@ include _posts
 block content
 
   unless notFound
+
     h1.title #{user.name}
+      unless user.equals(locals.currentUser._id)
+        if user.friends.indexOf(locals.currentUser._id) !== -1
+          span.tag.is-success.ml-5 Friend
+        else if (user.sentFriendRequests.indexOf(locals.currentUser._id) !== -1) || (user.recvFriendRequests.indexOf(locals.currentUser._id) !== -1)
+          span.tag.is-link.ml-5 Pending friend request
+        else
+          // Friend request form
+          form.is-inline(action="/user/" + user._id, method="POST")
+            input(type="hidden", name="_method", value="PATCH")
+            input(type="hidden", name="_query", value="sendFriendRequest")
+            button.link-button.tag.is-link.is-light.ml-5(type="submit") Add as friend
+      else
+        span.tag.is-primary.ml-5 You
+
     if profile.status
       h2.subtitle Status: #{profile.status}
+
     .section.columns
       .column.profileInfo.is-one-quarter
         if profile.picture
           img(src=profile.picture, alt="Profile Picture")
+        if user.recvFriendRequests.length > 0
+          p
+            a.has-text-weight-bold(href="/user/friends") #{user.recvFriendRequests.length} new friend request#{user.recvFriendRequests.length === 1 ? "" : "s" }
+          p
+            a(href="/user/friends") #{user.friends.length} friend#{user.friends.length === 1 ? "" : "s" }
+
+
       .column.posts
         for post in profile.posts
           +post(post)
         else
           p No posts to display. :(
-        .container.is-wi  
-          h2.title.is-5 New Post
-          form(action="/posts/new", method="POST")
-            input(type="hidden", name="profileId" value=profile._id)
-            .field
-              .control
-                textarea.textarea#post(name="post", rows="2")
-            .field.is-grouped
-              .control
-                button.button.is-link(type="submit") Submit
-              .control
-                button.button.is-light(type="reset") Reset
+
+        if user.equals(locals.currentUser._id)
+          .container.is-wi  
+            h2.title.is-5 New Post
+            form(action="/posts/new", method="POST")
+              input(type="hidden", name="profileId" value=profile._id)
+              .field
+                .control
+                  textarea.textarea#post(name="post", rows="2")
+              .field.is-grouped
+                .control
+                  button.button.is-link(type="submit") Submit
+                .control
+                  button.button.is-light(type="reset") Reset
 
   else
     h1.title.has-text-danger Profile not found. :(
