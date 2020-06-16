@@ -97,5 +97,24 @@ export default class UserController {
             return next(err);
         }
     }
-}
 
+    static async sendFriendRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const friend = await User.findById(req.params.id).exec();
+            const user = await User.findOne(req.user).exec();
+            if (!friend || !user) {
+                res.status(404).redirect("back");
+            } else {
+                if (friend.recvFriendRequests?.indexOf(user._id) === -1) {
+                    await User.updateOne(friend, { $push: { recvFriendRequests: user } });
+                }
+                if (user.sentFriendRequests?.indexOf(friend._id) === -1) {
+                    await User.updateOne(user, { $push: { sentFriendRequests: friend } });
+                }
+                next();
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+}
