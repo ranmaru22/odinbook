@@ -27,7 +27,7 @@ html(lang="en")
                 p Hello, 
                   a(href=locals.currentUser.url) #{locals.currentUser.name}
                   | ! (
-                  a(href="/users/logout") Logout
+                  a(href="/user/logout") Logout
                   | )
               else
                 p Not logged in.
