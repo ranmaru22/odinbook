@@ -99,7 +99,8 @@ export default abstract class UserController {
                         options: { sort: { "dateposted": -1 } }
                     })
                     .exec();
-                res.render("profile", { user: user, profile: profile });
+                const isFriend = await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec() !== null;
+                res.render("profile", { user: user, profile: profile, isFriend: isFriend });
             }
         } catch (err) {
             return next(err);
@@ -116,7 +117,14 @@ export default abstract class UserController {
                 res.status(404).render("profile", { notFound: true });
             } else {
                 const profile = await Profile.findOne({ owner: user });
-                res.render("profile_friends", { user: user, profile: profile });
+                const friendStatus =
+                    await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec()
+                        ? "friend"
+                        : await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
+                            || await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
+                            ? "pending"
+                            : "none";
+                res.render("profile_friends", { user: user, profile: profile, friendStatus: friendStatus });
             }
         } catch (err) {
             return next(err);
