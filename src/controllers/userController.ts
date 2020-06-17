@@ -7,8 +7,8 @@ import Post, { IPost } from "../models/post";
 import Profile, { IProfile } from "../models/profile";
 
 /*
-* GET / - Own profile, same as GET /<yourId>
-* POST / - Add a new user
+ * GET / - Own profile, same as GET /<yourId>
+ * POST / - Add a new user
  * GET /:id - Profile of some user
  * PATCH /:id - Update profile
  * DELETE /:id - Delete profile
@@ -158,7 +158,23 @@ export default abstract class UserController {
                     $pull: { sentFriendRequests: user._id },
                     $push: { friends: user }
                 });
-                res.redirect(user.url);
+                res.redirect("back");
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+
+    static async declineFriendRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findOne(req.user).exec();
+            const friend = await User.findById(req.params.id).exec();
+            if (!friend || !user) {
+                res.status(404).redirect("back");
+            } else {
+                await User.updateOne(user, { $pull: { recvFriendRequests: friend?._id } });
+                await User.updateOne(friend, { $pull: { sentFriendRequests: user._id } });
+                res.redirect("back");
             }
         } catch (err) {
             return next(err);
