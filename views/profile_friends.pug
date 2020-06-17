@@ -1,8 +1,16 @@
 extends profile_layout
 
 block profileContent
-  if user.friends
+  if user.recvFriendRequests.length > 0
+    .container
+      h2.title.is-4 Friend Requests
+      for friendRequest in user.recvFriendRequests
+        p
+          a(href=friendRequest.url) #{friendRequest.name}
+
+  .container.mt-6
+    h2.title.is-4 Friends
     for friend in user.friends
       p #{friend.name}
-  else
-    p No friends yet. :(
+    else
+      p No friends yet. :(
