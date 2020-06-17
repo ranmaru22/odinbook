@@ -14,7 +14,7 @@ import Profile, { IProfile } from "../models/profile";
  * DELETE /:id - Delete profile
 */
 
-export default class UserController {
+export default abstract class UserController {
     static userValidationChain: validator.ValidationChain[] = [
         validator.body("name").trim().isLength({ min: 3 }).withMessage("Name can't be less than 3 characters."),
         validator.body("email").trim()
@@ -73,7 +73,15 @@ export default class UserController {
         }
     }
 
-    static async profileGet(req: Request, res: Response, next: NextFunction): Promise<void> {
+    static profileGet(req: Request, res: Response, next: NextFunction): void {
+        if (req.params.page === "friends") {
+            UserController.profileGetFriends(req, res, next);
+        } else {
+            UserController.profileGetPosts(req, res, next);
+        }
+    }
+
+    private static async profileGetPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.params.id).exec();
             if (!user) {
@@ -92,6 +100,23 @@ export default class UserController {
                     })
                     .exec();
                 res.render("profile", { user: user, profile: profile });
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+
+    private static async profileGetFriends(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findById(req.params.id)
+                .populate({ path: "friends", select: "name" })
+                .populate({ path: "recvFriendRequests" })
+                .exec();
+            if (!user) {
+                res.status(404).render("profile", { notFound: true });
+            } else {
+                const profile = await Profile.findOne({ owner: user });
+                res.render("profile_friends", { user: user, profile: profile });
             }
         } catch (err) {
             return next(err);
