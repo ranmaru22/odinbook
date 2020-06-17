@@ -38,6 +38,12 @@ class UserRouter {
                 case "sendFriendRequest":
                     UserController.sendFriendRequest(req, res, next);
                     break;
+                case "acceptFriendRequest":
+                    UserController.acceptFriendRequest(req, res, next);
+                    break;
+                case "declineFriendRequest":
+                    UserController.declineFriendRequest(req, res, next);
+                    break;
                 default: next();
             }
         } else {
