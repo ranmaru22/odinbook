@@ -1,0 +1,18 @@
+mixin friend(friend, isRequest=false)
+  .tile.is-child.box
+    p
+      a(href=friend.url) #{friend.name}
+    if isRequest
+      +requestWrapper(friend)
+
+
+mixin requestWrapper(friend)
+  .container.has-text-centered.mt-4
+    form.is-inline(action="/user/" + friend._id, method="POST")
+      input(type="hidden", name="_method", value="PATCH")
+      input(type="hidden", name="_query", value="acceptFriendRequest")
+      button.button.is-small.link-button.has-text-grey.ml-2(type="submit") Accept
+    form.is-inline(action="/user/" + friend._id, method="POST")
+      input(type="hidden", name="_method", value="PATCH")
+      input(type="hidden", name="_query", value="declineFriendRequest")
+      button.button.is-small.link-button.has-text-grey.ml-2(type="submit") Decline
