@@ -4,13 +4,14 @@ block profileContent
   if user.recvFriendRequests.length > 0
     .container
       h2.title.is-4 Friend Requests
-      for friendRequest in user.recvFriendRequests
-        p
-          a(href=friendRequest.url) #{friendRequest.name}
+      .tile.is-4.is-parent
+        for friendRequest in user.recvFriendRequests
+          +friend(friendRequest, true)
 
   .container.mt-6
     h2.title.is-4 Friends
-    for friend in user.friends
-      p #{friend.name}
-    else
-      p No friends yet. :(
+    .tile.is-4.is-parent
+      for friend in user.friends
+        +friend(friend)
+      else
+        p No friends yet. :(
