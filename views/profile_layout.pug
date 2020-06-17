@@ -31,8 +31,8 @@ block content
         if user.recvFriendRequests.length > 0
           p
             a.has-text-weight-bold(href="/user/" + user._id + "/friends") #{user.recvFriendRequests.length} new friend request#{user.recvFriendRequests.length === 1 ? "" : "s" }
-          p
-            a(href="/user/" + user._id + "/friends") #{user.friends.length} friend#{user.friends.length === 1 ? "" : "s" }
+        p
+          a(href="/user/" + user._id + "/friends") #{user.friends.length} friend#{user.friends.length === 1 ? "" : "s" }
 
       .column.posts
         block profileContent
