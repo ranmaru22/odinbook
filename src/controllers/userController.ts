@@ -117,4 +117,26 @@ export default class UserController {
             return next(err);
         }
     }
+
+    static async acceptFriendRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findOne(req.user).exec();
+            const friend = await User.findById(req.params.id).exec();
+            if (!friend || !user) {
+                res.status(404).redirect("back");
+            } else {
+                await User.updateOne(user, {
+                    $pull: { recvFriendRequests: friend?._id },
+                    $push: { friends: friend }
+                });
+                await User.updateOne(friend, {
+                    $pull: { sentFriendRequests: user._id },
+                    $push: { friends: user }
+                });
+                res.redirect(user.url);
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
 }
