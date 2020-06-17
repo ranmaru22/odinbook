@@ -1,17 +1,24 @@
 extends profile_layout
 
 block profileContent
-  if user.recvFriendRequests.length > 0
-    .container
-      h2.title.is-4 Friend Requests
-      .tile.is-4.is-parent
-        for friendRequest in user.recvFriendRequests
-          +friend(friendRequest, true)
+  .level
+    if user.recvFriendRequests.length > 0
+      .container
+        h2.title.is-4 Friend Requests
+          for friendRequest in user.recvFriendRequests
+            +friend(friendRequest, true)
 
-  .container.mt-6
-    h2.title.is-4 Friends
-    .tile.is-4.is-parent
-      for friend in user.friends
-        +friend(friend)
-      else
-        p No friends yet. :(
+    .container.mt-6
+      h2.title.is-4 Friends
+        for friend, index in user.friends
+          +friend(friend)
+          +friend(friend)
+          +friend(friend)
+          +friend(friend)
+          br
+          +friend(friend)
+          +friend(friend)
+          +friend(friend)
+          +friend(friend)
+        else
+          p No friends yet. :(

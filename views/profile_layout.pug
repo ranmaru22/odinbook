@@ -8,10 +8,10 @@ block content
 
     h1.title #{user.name}
       unless user.equals(locals.currentUser._id)
-        if user.friends.indexOf(locals.currentUser._id) !== -1
+        if friendStatus === "friend"
           span.tag.is-success.ml-5 Friend
-        else if (user.sentFriendRequests.indexOf(locals.currentUser._id) !== -1) || (user.recvFriendRequests.indexOf(locals.currentUser._id) !== -1)
-          span.tag.is-link.ml-5 Pending friend request
+        else if friendStatus === "pending"
+         span.tag.is-link.ml-5 Pending friend request
         else
           // Friend request form
           form.is-inline(action="/user/" + user._id, method="POST")
