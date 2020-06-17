@@ -1,0 +1,8 @@
+extends profile_layout
+
+block profileContent
+  if user.friends
+    for friend in user.friends
+      p #{friend.name}
+  else
+    p No friends yet. :(
