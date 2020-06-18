@@ -4,12 +4,12 @@ import { IUser } from "./user";
 
 export interface IPost extends mongoose.Document {
     text: string;
-    author: IUser | string;
+    author: IUser;
     likes: number;
-    likedBy?: IUser[] | string[];
+    likedBy?: IUser[];
     dateposted: Date;
-    parent?: IPost | string;
-    replies?: IPost[] | string[];
+    parent?: IPost;
+    replies?: IPost[];
     url: string;
 }
 

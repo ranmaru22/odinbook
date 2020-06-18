@@ -6,11 +6,11 @@ export interface IUser extends mongoose.Document {
     email: string;
     password: string;
     joindate: Date;
-    friends?: IUser[] | string[];
-    sentFriendRequests?: IUser[] | string[];
-    recvFriendRequests?: IUser[] | string[];
+    friends?: IUser[];
+    sentFriendRequests?: IUser[];
+    recvFriendRequests?: IUser[];
     url: string;
-    posts: IPost[] | string[];
+    posts: IPost[];
 }
 
 const userSchema = new mongoose.Schema<IUser>({

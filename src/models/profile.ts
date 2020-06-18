@@ -3,10 +3,10 @@ import { IUser } from "./user";
 import { IPost } from "./post";
 
 export interface IProfile extends mongoose.Document {
-    owner: IUser | string;
+    owner: IUser;
     picture?: string;
     status?: string;
-    posts?: IPost[] | string[];
+    posts?: IPost[];
 }
 
 const profileSchema = new mongoose.Schema({
