@@ -28,11 +28,16 @@ namespace Auth {
 
     export async function confirmOwnerProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const profile = await Profile.findById(req.params.id).populate("owner").exec();
-            if ((profile?.owner as mongoose.Document).equals(req.user as mongoose.Document)) {
-                next();
+            const user = await User.findById(req.params.id).exec();
+            if (!user) {
+                res.status(404).redirect("back");
             } else {
-                res.redirect("back");
+                const profile = await Profile.findOne({ owner: user }).exec();
+                if (profile?.owner._id.equals(user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
             }
         } catch (err) {
             return next(err);
