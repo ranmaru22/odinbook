@@ -99,8 +99,15 @@ export default abstract class UserController {
                         options: { sort: { "dateposted": -1 } }
                     })
                     .exec();
+                const friendStatus =
+                    await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec()
+                        ? "friend"
+                        : await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
+                            || await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
+                            ? "pending"
+                            : "none";
                 const isFriend = await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec() !== null;
-                res.render("profile", { user: user, profile: profile, isFriend: isFriend });
+                res.render("profile", { user: user, profile: profile, friendStatus: friendStatus });
             }
         } catch (err) {
             return next(err);
@@ -183,6 +190,20 @@ export default abstract class UserController {
                 await User.updateOne(user, { $pull: { recvFriendRequests: friend?._id } });
                 await User.updateOne(friend, { $pull: { sentFriendRequests: user._id } });
                 res.redirect("back");
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+
+    static async profileGetEdit(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findById(req.params.id).exec();
+            if (!user) {
+                res.status(404).redirect("back");
+            } else {
+                const profile = await Profile.findOne({ owner: user }).exec();
+                res.render("profile_edit", { user, profile });
             }
         } catch (err) {
             return next(err);

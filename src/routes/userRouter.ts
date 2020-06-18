@@ -23,8 +23,9 @@ class UserRouter {
         });
         this.router.post("/new", UserController.userValidationChain, UserController.register);
         this.router.get("/:id", auth.protectRoute, UserController.profileGet);
-        this.router.get("/:id/:page", auth.protectRoute, UserController.profileGet);
+        this.router.get("/:id/edit", auth.protectRoute, auth.confirmOwnerProfile, UserController.profileGetEdit);
         this.router.post("/:id", auth.protectRoute, this.methodHandler, UserController.indexGet);
+        this.router.get("/:id/:page", auth.protectRoute, UserController.profileGet);
     }
 
     private methodHandler(req: Request, res: Response, next: NextFunction): void {
