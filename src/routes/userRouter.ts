@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import auth from "../services/auth";
+import multer from "../services/multer";
 import UserController from "../controllers/userController";
 
 class UserRouter {
@@ -24,6 +25,7 @@ class UserRouter {
         this.router.post("/new", UserController.userValidationChain, UserController.register);
         this.router.get("/:id", auth.protectRoute, UserController.profileGet);
         this.router.get("/:id/edit", auth.protectRoute, auth.confirmOwnerProfile, UserController.profileGetEdit);
+        this.router.post("/:id/edit", auth.protectRoute, auth.confirmOwnerProfile, multer.uploads, UserController.userUpdateValidationChain, UserController.profileUpdate);
         this.router.post("/:id", auth.protectRoute, this.methodHandler, UserController.indexGet);
         this.router.get("/:id/:page", auth.protectRoute, UserController.profileGet);
     }
