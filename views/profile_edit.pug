@@ -1,0 +1,52 @@
+extends profile_layout
+
+block profileContent
+  form(action="/user/" + user._id + "/edit", method="POST")
+    input(type="hidden", name="_method" value="PATCH")
+    .field
+      label.label(for="name") Name
+      .control.has-icons-left
+        input.input#name.column(type="text", name="name", value=(user.name ? user.name : ""))
+        span.icon.is-small.is-left
+          i.fas.fa-user
+    .field
+      label.label(for="email") Email
+      .control.has-icons-left
+        input.input#email.column(type="email", name="email", value=(user.email ? user.email : ""))
+        span.icon.is-small.is-left
+          i.fas.fa-envelope
+    .field
+      label.label(for="picture") Profile Picture
+      .control.has-icons-left
+        input.input#picture.column(type="file", name="picture")
+        span.icon.is-small.is-left
+          i.fas.fa-image
+    .field
+      label.label(for="status") Profile Status
+      .control.has-icons-left
+        input.input#status.column(type="text", name="status", value=(profile.status ? profile.status : ""))
+        span.icon.is-small.is-left
+          i.fas.fa-comment
+    .field
+      label.label(for="Password") Enter your password to confirm
+      .control.has-icons-left
+        input.input#password.column(type="password", name="newPassword")
+        span.icon.is-small.is-left
+          i.fas.fa-lock
+    .field
+      label.label(for="Password") New Password
+      .control.has-icons-left
+        input.input#newPassword.column(type="password", name="newPassword")
+        span.icon.is-small.is-left
+          i.fas.fa-lock
+    .field
+      label.label(for="confirmPassword") Confirm New Password
+      .control.has-icons-left
+        input.input#confirmPassword.column(type="password", name="confirmPassword")
+        span.icon.is-small.is-left
+          i.fas.fa-lock
+    .field.is-grouped
+      .control
+        button.button.is-link(type="submit") Submit
+      .control
+        button.button.is-light(type="reset") Reset
