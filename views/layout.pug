@@ -27,6 +27,8 @@ html(lang="en")
                 p Hello, 
                   a(href=locals.currentUser.url) #{locals.currentUser.name}
                   | ! (
+                  a(href="/user/" + currentUser._id + "/edit") Edit 
+                  | | 
                   a(href="/user/logout") Logout
                   | )
               else
