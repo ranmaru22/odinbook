@@ -51,7 +51,6 @@ export default class PostsController {
     static async likePost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const post = await Post.findOne({ _id: req.params.id }).exec();
-            console.log(post?.likedBy);
             if (post?.likedBy?.indexOf((req.user as IUser)._id) === -1) {
                 await Post.updateOne(post!, { $push: { likedBy: req.user as IUser } });
             } else {
