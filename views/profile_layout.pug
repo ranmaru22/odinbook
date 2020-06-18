@@ -28,7 +28,7 @@ block content
       .column.profileInfo.is-one-quarter
         if profile.picture
           img(src=profile.picture, alt="Profile Picture")
-        if user.recvFriendRequests.length > 0
+        if user.equals(locals.currentUser._id) && user.recvFriendRequests.length > 0
           p
             a.has-text-weight-bold(href="/user/" + user._id + "/friends") #{user.recvFriendRequests.length} new friend request#{user.recvFriendRequests.length === 1 ? "" : "s" }
         p
