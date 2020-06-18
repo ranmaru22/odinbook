@@ -209,4 +209,33 @@ export default abstract class UserController {
             return next(err);
         }
     }
+
+    static async profileUpdate(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findById(req.params.id).exec();
+            if (!user) {
+                res.status(404).redirect("back");
+            } else {
+                const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+                if (!passwordMatch) {
+                    return next(new Error("Wrong password"));
+                } else {
+                    const salt = await bcrypt.genSalt(10);
+                    const hash = req.body.password ? await bcrypt.hash(req.body.password, salt) : user.password;
+                    const userChanges = {
+                        name: req.body.name || user.name,
+                        email: req.body.email || user.email,
+                        password: hash,
+                    };
+                    const profileChanges = {
+                        status: req.body.status
+                    };
+                    await User.updateOne(user, userChanges);
+                    await Profile.updateOne({ owner: user }, profileChanges);
+                }
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
 }
