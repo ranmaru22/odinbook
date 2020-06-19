@@ -29,6 +29,10 @@ block profileContent
           span.icon.is-small.is-left
             i.fas.fa-image
       .field
+        label.checkbox(for="deleteImage")
+          input.mr-2#delteImage(type="checkbox", name="deleteImage") 
+          | Delete profile picture
+      .field
         label.label(for="status") Profile Status
         .control.has-icons-left
           input.input#status.column(type="text", name="status", value=(profile.status ? profile.status : ""))
