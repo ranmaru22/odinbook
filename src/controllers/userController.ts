@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import bcrypt from "bcrypt";
+import cloudinary from "cloudinary";
+import Multer from "../services/multer";
 
 import User, { IUser } from "../models/user";
 import Post, { IPost } from "../models/post";
@@ -37,6 +39,59 @@ export default abstract class UserController {
             })
     ];
 
+    static userUpdateValidationChain: validator.ValidationChain[] = [
+        validator.body("name").trim().isLength({ min: 3 }).withMessage("Name can't be less than 3 characters."),
+        validator.body("email").trim()
+            .isEmail().withMessage("Invalid email address")
+            .custom(async (val: string, { req }): Promise<string> => {
+                const user = await User.findOne({ email: val }).exec();
+                if (user && !user.equals(req.user)) {
+                    throw new Error("A user with that email address already exists.");
+                } else {
+                    return val;
+                }
+            }),
+        validator.body("currentPassword").trim()
+            .custom(async (val: string, { req }): Promise<string> => {
+                const user = await User.findById(req.params?.id).exec();
+                const match = await bcrypt.compare(val, user!.password);
+                if (!match) {
+                    throw new Error("Wrong password.");
+                } else {
+                    return val;
+                }
+            }),
+        validator.body("password").optional({ checkFalsy: true }).trim()
+            .isLength({ min: 8 }).withMessage("Password must be at least 8 characters long.")
+            .custom((val: string, { req }): string => {
+                if (val !== req.body.confirmPassword) {
+                    throw new Error("Passwords don't match.");
+                } else {
+                    return val;
+                }
+            })
+    ];
+
+    private static async getPwdHash(password: string): Promise<string> {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        return hash;
+    }
+
+    private static uploadImage(image: string, userId: string): Promise<cloudinary.UploadApiResponse> {
+        return new Promise((resolve, reject) => {
+            cloudinary.v2.uploader.upload(image, { public_id: `odinbook_profile_images/${userId}`, overwrite: true },
+                (err, url) => {
+                    if (err) {
+                        return reject(err);
+                    } else {
+                        return resolve(url);
+                    }
+                }
+            );
+        });
+    }
+
     static async indexGet(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById((req.user as IUser)._id).exec();
@@ -56,8 +111,7 @@ export default abstract class UserController {
             if (!validationErrors.isEmpty()) {
                 return res.render("index", { errors: validationErrors.array() });
             } else {
-                const salt = await bcrypt.genSalt(10);
-                const passHash = await bcrypt.hash(req.body.password, salt);
+                const passHash = await UserController.getPwdHash(req.body.password);
                 const user = new User({
                     name: req.body.name,
                     email: req.body.email,
@@ -103,10 +157,9 @@ export default abstract class UserController {
                     await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec()
                         ? "friend"
                         : await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
-                            || await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
+                            || await User.findOne({ _id: req.params.id, recvFriendRequests: res.locals.currentUser }).exec()
                             ? "pending"
                             : "none";
-                const isFriend = await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec() !== null;
                 res.render("profile", { user: user, profile: profile, friendStatus: friendStatus });
             }
         } catch (err) {
@@ -212,27 +265,33 @@ export default abstract class UserController {
 
     static async profileUpdate(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const validationErrors = validator.validationResult(req);
             const user = await User.findById(req.params.id).exec();
-            if (!user) {
+            const profile = await Profile.findOne({ owner: user! }).exec();
+            if (!user || !profile) {
                 res.status(404).redirect("back");
+            } else if (!validationErrors.isEmpty()) {
+                return res.render("profile_edit", { user, profile, errors: validationErrors.array() });
             } else {
-                const passwordMatch = await bcrypt.compare(req.body.password, user.password);
-                if (!passwordMatch) {
-                    return next(new Error("Wrong password"));
-                } else {
-                    const salt = await bcrypt.genSalt(10);
-                    const hash = req.body.password ? await bcrypt.hash(req.body.password, salt) : user.password;
-                    const userChanges = {
-                        name: req.body.name || user.name,
-                        email: req.body.email || user.email,
-                        password: hash,
-                    };
-                    const profileChanges = {
-                        status: req.body.status
-                    };
-                    await User.updateOne(user, userChanges);
-                    await Profile.updateOne({ owner: user }, profileChanges);
+                const passHash = req.body.password
+                    ? await UserController.getPwdHash(req.body.password)
+                    : undefined;
+                const userChanges = {
+                    name: req.body.name || user.name,
+                    email: req.body.email || user.email,
+                    password: passHash || user.password,
+                };
+                const profileChanges = {
+                    status: req.body.status,
+                    // picture: image.url || undefined
+                };
+                if (req.file) {
+                    const image = await UserController.uploadImage(Multer.dataUri(req).content as string, user._id);
+                    console.log(image);
                 }
+                await User.updateOne(user, userChanges);
+                await Profile.updateOne(profile, profileChanges);
+                res.redirect(user.url);
             }
         } catch (err) {
             return next(err);
