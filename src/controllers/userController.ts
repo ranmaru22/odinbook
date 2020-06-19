@@ -92,6 +92,18 @@ export default abstract class UserController {
         });
     }
 
+    private static deleteImage(userId: string): Promise<cloudinary.DeleteApiResponse> {
+        return new Promise((resolve, reject) => {
+            cloudinary.v2.uploader.destroy(`odinbook_profile_images/${userId}`, (err, result) => {
+                if (err) {
+                    return reject(err);
+                } else {
+                    return resolve(result);
+                }
+            });
+        });
+    }
+
     static async indexGet(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById((req.user as IUser)._id).exec();
@@ -283,11 +295,14 @@ export default abstract class UserController {
                 };
                 const profileChanges = {
                     status: req.body.status,
-                    // picture: image.url || undefined
+                    picture: profile.picture || ""
                 };
-                if (req.file) {
+                if (req.body.deleteImage && profile.picture) {
+                    await UserController.deleteImage(user._id);
+                    profileChanges.picture = "";
+                } else if (req.file) {
                     const image = await UserController.uploadImage(Multer.dataUri(req).content as string, user._id);
-                    console.log(image);
+                    profileChanges.picture = image.secure_url;
                 }
                 await User.updateOne(user, userChanges);
                 await Profile.updateOne(profile, profileChanges);
