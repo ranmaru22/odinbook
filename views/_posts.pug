@@ -8,6 +8,9 @@ mixin post(post)
           button.delete.is-pulled-right(type="submit")
 
       p
+        if post.author.picture
+          figure.image.is-48x48.is-pulled-left.mr-2.mb-1
+            img.is-avatar-48(src=post.author.picture, alt=(post.author.name + "'s Avatar"))
         a(href=post.author.url) #[strong #{post.author.name}] 
         | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
       p= post.text
@@ -53,6 +56,9 @@ mixin reply(post)
     form(action="/posts/" + post._id, method="POST")
       input(type="hidden", name="_method", value="PATCH")
       input(type="hidden", name="_query", value="like")
+      if post.author.picture
+        figure.image.is-32x32.is-pulled-left.mr-2
+          img.is-avatar-32(src=post.author.picture, alt="#{post.author.name}'s Avatar")
       a(href=post.author.url) #[strong #{post.author.name}] 
       | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
       button.button.is-small.link-button.has-text-grey.ml-2(type="submit")
