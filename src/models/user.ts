@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema<IUser>({
 });
 
 userSchema.virtual("url")
-    .get((function (this: IUser): string { return `/user/${this._id}` }));
+    .get((function (this: IUser): string { return `/user/${this._id}`; }));
 
 userSchema.virtual("posts", {
     ref: "Post",
