@@ -54,7 +54,7 @@ postSchema.virtual("replyCount", {
 });
 
 postSchema.virtual("url")
-    .get((function (this: IPost): string { return `/posts/${this._id}` }));
+    .get((function (this: IPost): string { return `/posts/${this._id}`; }));
 
 postSchema.virtual("datepostedRelative")
     .get(function (this: IPost): string {
