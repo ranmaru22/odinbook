@@ -1,0 +1,17 @@
+extends layout
+include _posts
+
+block content
+  .container
+    if profilePicture
+      a(href=user.url)
+        figure.image.is-64x64.is-pulled-left.mr-3
+          img.is-rounded(src=profilePicture, alt="Profile Picture")
+    h1.title.pt-3 Your Timeline
+
+  .section
+    .container
+      for post in posts
+        +post(post)
+      else
+        p Nothing to display. :(
