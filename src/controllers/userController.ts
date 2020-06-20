@@ -104,13 +104,46 @@ export default abstract class UserController {
         });
     }
 
+    private static async loadPosts(profileOwner: IUser, includeFriendPosts?: boolean): Promise<IPost[]> {
+        try {
+            const profile = await Profile
+                .findOne({ owner: profileOwner })
+                .populate({
+                    path: "posts",
+                    populate: [
+                        { path: "author", select: [ "name", "picture" ] },
+                        { path: "replies", populate: { path: "author", select: [ "name", "picture" ] } },
+                        { path: "replyCount" },
+                    ],
+                    options: { sort: { "dateposted": -1 } }
+                })
+                .exec();
+            if (!profile) {
+                return new Array();
+            } else if (!includeFriendPosts) {
+                return profile.posts ?? new Array();
+            } else {
+                const friendPromises = await Promise.all(
+                    profileOwner.friends?.map(x => UserController.loadPosts(x))!
+                ).catch(err => err);
+                const posts = friendPromises
+                    .reduce((acc: IPost[], val: IPost) => acc.concat(val), profile.posts)
+                    .sort((a: IPost, b: IPost) => a.dateposted > b.dateposted ? -1 : a.dateposted < b.dateposted ? 1 : 0);
+                return posts ?? [];
+            }
+        } catch (err) {
+            return err;
+        }
+    }
+
     static async indexGet(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById((req.user as IUser)._id).exec();
             if (user) {
-                res.redirect(user.url);
+                const posts = await UserController.loadPosts(user, true);
+                res.render("profile_timeline", { user, posts });
             } else {
-                res.redirect("/");
+                res.status(404).redirect("/");
             }
         } catch (err) {
             return next(err);
@@ -153,18 +186,8 @@ export default abstract class UserController {
             if (!user) {
                 res.status(404).render("profile", { notFound: true });
             } else {
-                const profile = await Profile
-                    .findOne({ owner: user })
-                    .populate({
-                        path: "posts",
-                        populate: [
-                            { path: "author", select: "name" },
-                            { path: "replies", populate: { path: "author", select: "name" } },
-                            { path: "replyCount" },
-                        ],
-                        options: { sort: { "dateposted": -1 } }
-                    })
-                    .exec();
+                const profile = await Profile.findOne({ owner: user }).exec();
+                const posts = await UserController.loadPosts(user);
                 const friendStatus =
                     await User.findOne({ _id: req.params.id, friends: res.locals.currentUser }).exec()
                         ? "friend"
@@ -172,7 +195,7 @@ export default abstract class UserController {
                             || await User.findOne({ _id: req.params.id, recvFriendRequests: res.locals.currentUser }).exec()
                             ? "pending"
                             : "none";
-                res.render("profile", { user: user, profile: profile, friendStatus: friendStatus });
+                res.render("profile", { user, profile, posts, friendStatus });
             }
         } catch (err) {
             return next(err);
@@ -292,17 +315,17 @@ export default abstract class UserController {
                     name: req.body.name || user.name,
                     email: req.body.email || user.email,
                     password: passHash || user.password,
+                    picture: user.picture || ""
                 };
                 const profileChanges = {
                     status: req.body.status,
-                    picture: profile.picture || ""
                 };
-                if (req.body.deleteImage && profile.picture) {
+                if (req.body.deleteImage && user.picture) {
                     await UserController.deleteImage(user._id);
-                    profileChanges.picture = "";
+                    userChanges.picture = "";
                 } else if (req.file) {
                     const image = await UserController.uploadImage(Multer.dataUri(req).content as string, user._id);
-                    profileChanges.picture = image.secure_url;
+                    userChanges.picture = image.secure_url;
                 }
                 await User.updateOne(user, userChanges);
                 await Profile.updateOne(profile, profileChanges);
