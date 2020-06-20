@@ -31,7 +31,7 @@ export default class PostsController {
                 if (req.body.parentpost) {
                     post.parent = req.body.parentpost;
                 }
-                const savedPost = await post.save();
+                await post.save();
                 return res.redirect("back");
             }
         } catch (err) {
