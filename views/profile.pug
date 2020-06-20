@@ -1,7 +1,7 @@
 extends profile_layout
 
 block profileContent
-    for post in profile.posts
+    for post in posts
       +post(post)
     else
       p No posts to display. :(
