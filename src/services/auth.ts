@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import Post, { IPost } from "../models/post";
 import User, { IUser } from "../models/user";
 import Profile, { IProfile } from "../models/profile";
-import mongoose from "mongoose";
 
 namespace Auth {
     export function protectRoute(req: Request, res: Response, next: NextFunction): void {
