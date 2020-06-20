@@ -17,6 +17,8 @@ namespace Auth {
             const post = await Post.findById(req.params.id).populate("author").exec();
             if (post?.author.equals((req.user as IUser)._id)) {
                 next();
+            } else if (req.body._method === "PATCH" && req.body._query === "like") {
+                next();
             } else {
                 res.status(401).redirect("back");
             }
