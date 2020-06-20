@@ -6,7 +6,11 @@ import { Request, Response } from "express";
 
 export default class IndexController {
     static index(req: Request, res: Response): void {
-        return res.render("index");
+        if (req.user) {
+            res.redirect("/user")
+        } else {
+            res.render("index");
+        }
     }
 }
 
