@@ -180,6 +180,19 @@ export default abstract class UserController {
         }
     }
 
+    static async allUsersGet(req: Request, res: Response, next: NextFunction): void {
+        try {
+            const users = await User.find().exec();
+            if (!users) {
+                res.status(500).redirect("/");
+            } else {
+                res.render("userlist", { users });
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+
     private static async profileGetPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.params.id).exec();
@@ -219,7 +232,7 @@ export default abstract class UserController {
                             || await User.findOne({ _id: req.params.id, sentFriendRequests: res.locals.currentUser }).exec()
                             ? "pending"
                             : "none";
-                res.render("profile_friends", { user: user, profile: profile, friendStatus: friendStatus });
+                res.render("profile_friends", { user, profile, friendStatus });
             }
         } catch (err) {
             return next(err);
