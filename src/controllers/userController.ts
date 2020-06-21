@@ -180,7 +180,7 @@ export default abstract class UserController {
         }
     }
 
-    static async allUsersGet(req: Request, res: Response, next: NextFunction): void {
+    static async allUsersGet(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const users = await User.find().exec();
             if (!users) {
