@@ -49,6 +49,9 @@ class UserRouter {
                 case "declineFriendRequest":
                     UserController.declineFriendRequest(req, res, next);
                     break;
+                case "unfriend":
+                    UserController.unfriend(req, res, next);
+                    break;
                 default: next();
             }
         } else {

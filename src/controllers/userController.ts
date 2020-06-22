@@ -301,6 +301,22 @@ export default abstract class UserController {
         }
     }
 
+    static async unfriend(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findOne(req.user).exec();
+            const friend = await User.findById(req.params.id).exec();
+            if (!friend || !user) {
+                res.status(404).redirect("back");
+            } else {
+                await User.updateOne(user, { $pull: { friends: friend._id }});
+                await User.updateOne(friend, { $pull: { friends: user._id }});
+                res.redirect("back");
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+
     static async profileGetEdit(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.params.id).exec();
