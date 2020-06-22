@@ -1,21 +1,22 @@
 extends profile_layout
 
 block profileContent
-    for post in posts
-      +post(post)
-    else
-      p No posts to display. :(
+  h1.title.is-4 Pinboard
 
-    if user.equals(locals.currentUser._id)
-      .container.is-wi  
-        h2.title.is-5 New Post
-        form(action="/posts/new", method="POST")
-          input(type="hidden", name="profileId" value=profile._id)
-          .field
-            .control
-              textarea.textarea#post(name="post", rows="2")
-          .field.is-grouped
-            .control
-              button.button.is-link(type="submit") Submit
-            .control
-              button.button.is-light(type="reset") Reset
+  if user.equals(locals.currentUser._id)
+    .section
+      form(action="/posts/new", method="POST")
+        input(type="hidden", name="profileId" value=profile._id)
+        .field
+          .control
+            textarea.textarea#post(name="post", rows="2", placeholder="Make a new post ...")
+        .field.is-grouped
+          .control
+            button.button.is-link(type="submit") Submit
+          .control
+            button.button.is-light(type="reset") Reset
+
+  for post in posts
+    +post(post)
+  else
+    p No posts to display. :(
