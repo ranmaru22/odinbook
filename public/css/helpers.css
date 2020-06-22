@@ -1,34 +1,34 @@
 .link-button {
-    background: none;
-    border: none;
-    height: 1rem;
+  background: none;
+  border: none;
+  height: 1rem;
 }
 
 .has-img-centered {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .is-avatar-32 {
-    max-height: 32px;
-    width: 100%;
-    object-fit: contain;
+  max-height: 32px;
+  width: 100%;
+  object-fit: contain;
 }
 
 .is-avatar-48 {
-    max-height: 48px;
-    width: 100%;
-    object-fit: contain;
+  max-height: 48px;
+  width: 100%;
+  object-fit: contain;
 }
 
 .is-avatar-64 {
-    max-height: 64px;
-    width: 100%;
-    object-fit: contain;
+  max-height: 64px;
+  width: 100%;
+  object-fit: contain;
 }
 
 .is-avatar-128 {
-    max-height: 128px;
-    width: 100%;
-    object-fit: contain;
+  max-height: 128px;
+  width: 100%;
+  object-fit: contain;
 }
