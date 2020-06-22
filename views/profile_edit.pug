@@ -23,6 +23,7 @@ block profileContent
           input.input#email.column(type="email", name="email", value=(user.email ? user.email : ""))
           span.icon.is-small.is-left
             i.fas.fa-envelope
+      hr
       .field
         label.label(for="image") Profile Picture
         .control.has-icons-left
@@ -39,6 +40,7 @@ block profileContent
           input.input#status.column(type="text", name="status", value=(profile.status ? profile.status : ""))
           span.icon.is-small.is-left
             i.fas.fa-comment
+      hr
       .field
         label.label(for="Password") New Password (or leave blank to keep)
         .control.has-icons-left
