@@ -1,41 +1,38 @@
 mixin post(post)
   .box
-    .container.mb-3
-      if post.author.equals(locals.currentUser)
-        // Delete form
-        form(action="/posts/" + post._id, method="POST")
-          input(type="hidden", name="_method", value="DELETE")
-          button.delete.is-pulled-right(type="submit")
+    article.media
 
-      p
+      .media-left
         if post.author.picture
-          figure.image.is-48x48.is-pulled-left.mr-2.mb-1
-            img.is-avatar-48(src=post.author.picture, alt=(post.author.name + "'s Avatar"))
-        a(href=post.author.url) #[strong #{post.author.name}] 
-        | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
-      p= post.text
+          p.image.is-64x64.is-pulled-left.mr-2.mb-1
+            img.is-avatar-64(src=post.author.picture, alt=(post.author.name + "'s Avatar"))
 
-    .buttons
-      // Like form
-      form(action="/posts/" + post._id, method="POST")
-        input(type="hidden", name="_method", value="PATCH")
-        input(type="hidden", name="_query", value="like")
-        button.button.is-small.is-rounded(type="submit")
-          span.icon.is-small
-            i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
-          span #{post.likes}
+      .media-content
+        .content
+          p
+            a(href=post.author.url) #[strong #{post.author.name}] 
+            | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+            br
+          | #{post.text}
+        nav.level.is-mobile
+          .level-left
+            .level-item.mb-2
+              form(action="/posts/" + post._id, method="POST")
+                input(type="hidden", name="_method", value="PATCH")
+                input(type="hidden", name="_query", value="like")
+                button.link-button(type="submit")
+                  span.icon.is-small
+                    i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
+                  span.ml-1 #{post.likes}
 
-    .columns
-      .column
-        // Reply form
-        form(action="/posts/new", method="POST")
-          input(type="hidden", name="parentpost" value=post._id)
-          .field.has-addons
-            .control.is-expanded
-              input.input.is-small#post(name="post", rows="1", placeholder="Reply")
-            .control
-              button.button.is-info.is-small(type="submit") Submit
+      .media-right
+        if post.author.equals(locals.currentUser)
+          // Delete form
+          form(action="/posts/" + post._id, method="POST")
+            input(type="hidden", name="_method", value="DELETE")
+            button.delete(type="submit")
 
+    // Hide/show replies
     .container.is-size-7
       p 
         a(id=("t_" + post._id), onClick=`hideReplies("` + post._id + `")`) [-] 
@@ -44,25 +41,42 @@ mixin post(post)
         for reply in post.replies
           +reply(reply)
 
+    // Reply form
+    form.mt-3(action="/posts/new", method="POST")
+      input(type="hidden", name="parentpost" value=post._id)
+      .field.has-addons
+        .control.is-expanded
+          input.input.is-small#post(name="post", rows="1", placeholder="Reply")
+        .control
+          button.button.is-info.is-small(type="submit") Submit
+
 mixin reply(post)
-  hr.my-2
-  .container
-    if post.author.equals(locals.currentUser)
-      // Delete form
-      form(action="/posts/" + post._id, method="POST")
-        input(type="hidden", name="_method", value="DELETE")
-        button.delete.is-pulled-right(type="submit")
-    // Like form
-    form(action="/posts/" + post._id, method="POST")
-      input(type="hidden", name="_method", value="PATCH")
-      input(type="hidden", name="_query", value="like")
-      if post.author.picture
-        figure.image.is-32x32.is-pulled-left.mr-2
-          img.is-avatar-32(src=post.author.picture, alt="#{post.author.name}'s Avatar")
-      a(href=post.author.url) #[strong #{post.author.name}] 
-      | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
-      button.button.is-small.link-button.has-text-grey.ml-2(type="submit")
-        span.icon.is-small
-          i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
-        span #{post.likes}
-    p= post.text
+    article.media.mt-3
+
+      .media-left
+        if post.author.picture
+          p.image.is-32x32.is-pulled-left.mr-2.mb-1
+            img.is-avatar-32(src=post.author.picture, alt=(post.author.name + "'s Avatar"))
+
+      .media-content
+        .content
+          div
+            a(href=post.author.url) #[strong #{post.author.name}] 
+            | #[span.is-size-7.has-text-grey.pl-1 #{post.datepostedRelative}]
+            form.is-inline(action="/posts/" + post._id, method="POST")
+              input(type="hidden", name="_method", value="PATCH")
+              input(type="hidden", name="_query", value="like")
+              button.link-button(type="submit")
+                small
+                  span.icon.is-small
+                    i.fas.fa-thumbs-up(class=(post.likedBy.indexOf(user._id) !== -1 ? "has-text-link" : ""))
+                  span.ml-1 #{post.likes}
+            br
+          | #{post.text}
+
+      .media-right
+        if post.author.equals(locals.currentUser)
+          // Delete form
+          form(action="/posts/" + post._id, method="POST")
+            input(type="hidden", name="_method", value="DELETE")
+            button.delete(type="submit")
