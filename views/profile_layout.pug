@@ -15,13 +15,13 @@ block content
               if friendStatus === "friend"
                 span.tag.is-success.is-pulled-right.ml-5 Friend
               else if friendStatus === "pending"
-               span.tag.is-link.is-pulled-right.ml-5 Pending friend request
+               span.tag.is-link.is-pulled-right.ml-5 Pending
               else
                 // Friend request form
                 form.is-inline(action="/user/" + user._id, method="POST")
                   input(type="hidden", name="_method", value="PATCH")
                   input(type="hidden", name="_query", value="sendFriendRequest")
-                  button.link-button.tag.is-link.is-light.is-pulled-right.ml-5(type="submit") Add as friend
+                  button.link-button.tag.is-link.is-light.is-pulled-right.ml-5(type="submit") Add friend
             else
               span.tag.is-primary.is-pulled-right.ml-5 You
 
