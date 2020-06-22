@@ -21,17 +21,23 @@ html(lang="en")
             span
         .navbar-menu#navbarContent
           .navbar-start
+            if locals.currentUser
+              .navbar-item
+                a.mr-2(href="/user/" + currentUser._id) Profile 
+              .navbar-item
+                a.mr-2(href="/user/" + currentUser._id + "/edit") Settings
+              .navbar-item
+                a.mr-2(href="/user/all") Find friends
           .navbar-end
-            .navbar-item
-              if locals.currentUser
+            if locals.currentUser
+              .navbar-item
+                img.is-mobile.mr-3.is-desktop(src=locals.currentUser.picture, alt="")
                 p Hello, 
                   a(href=locals.currentUser.url) #{locals.currentUser.name}
-                  | ! (
-                  a(href="/user/" + currentUser._id + "/edit") Edit 
-                  | | 
-                  a(href="/user/logout") Logout
-                  | )
-              else
+              .navbar-item
+                a(href="/user/logout") Logout
+            else
+              .navbar-item
                 p Not logged in.
 
     main.section.mt-6
