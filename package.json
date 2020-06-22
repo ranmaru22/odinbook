@@ -1,6 +1,7 @@
 {
-  "name": "odinbook",
+  "name": "Odinbook",
   "version": "1.0.0",
+  "engines": { "node": "14.3.x" },
   "description": "A Facebook clone made as a final capstone for The Odin Project",
   "main": "index.js",
   "scripts": {
