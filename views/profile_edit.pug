@@ -1,6 +1,7 @@
 extends profile_layout
 
 block profileContent
+  h1.title.is-4 Edit your profile
   form(action="/user/" + user._id + "/edit", method="POST", enctype="multipart/form-data")
     .field.has-text-centered
       label.label(for="Password") Enter your password to make any changes
