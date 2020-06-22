@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/index.js",
-    "build": "tsc -p",
+    "build": "tsc",
     "test": "mocha",
     "devstart": "nodemon -r dotenv/config --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts"
   },
