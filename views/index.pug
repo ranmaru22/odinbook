@@ -6,22 +6,23 @@ block content
     h2.subtitle Don't have an account yet? Click 
       a(href="/user/new") here 
       | to register
-    form(action="/user/login", method="POST")
-      .field
-        label.label(for="email") Email
-        .control.has-icons-left
-          input.input#emailLogin.column(type="email", name="email")
-          span.icon.is-small.is-left
-            i.fas.fa-envelope
-      .field
-        label.label(for="Password") Password
-        .control.has-icons-left
-          input.input#passwordLogin.column(type="password", name="password")
-          span.icon.is-small.is-left
-            i.fas.fa-lock
-      .field
-        .control
-          button.button.is-link(type="submit") Submit
+    .container.box
+      form(action="/user/login", method="POST")
+        .field
+          label.label(for="email") Email
+          .control.has-icons-left
+            input.input#emailLogin.column(type="email", name="email")
+            span.icon.is-small.is-left
+              i.fas.fa-envelope
+        .field
+          label.label(for="Password") Password
+          .control.has-icons-left
+            input.input#passwordLogin.column(type="password", name="password")
+            span.icon.is-small.is-left
+              i.fas.fa-lock
+        .field
+          .control
+            button.button.is-link(type="submit") Submit
 
     if errors
       for error in errors
