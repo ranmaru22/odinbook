@@ -149,12 +149,16 @@ export default abstract class UserController {
             return next(err);
         }
     }
+    
+    static registerGet(req: Request, res: Response, next: NextFunction): void {
+       res.render("register");
+    }
 
     static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const validationErrors = validator.validationResult(req);
             if (!validationErrors.isEmpty()) {
-                return res.render("index", { errors: validationErrors.array() });
+                res.render("register", { errors: validationErrors.array() });
             } else {
                 const passHash = await UserController.getPwdHash(req.body.password);
                 const user = new User({
@@ -165,7 +169,7 @@ export default abstract class UserController {
                 const savedUser = await user.save();
                 const profile = new Profile({ owner: savedUser });
                 await profile.save();
-                return res.redirect(307, "/user/login");
+                res.redirect(307, "/user/login");
             }
         } catch (err) {
             return next(err);
@@ -319,7 +323,7 @@ export default abstract class UserController {
             if (!user || !profile) {
                 res.status(404).redirect("back");
             } else if (!validationErrors.isEmpty()) {
-                return res.render("profile_edit", { user, profile, errors: validationErrors.array() });
+                res.render("profile_edit", { user, profile, errors: validationErrors.array() });
             } else {
                 const passHash = req.body.password
                     ? await UserController.getPwdHash(req.body.password)
