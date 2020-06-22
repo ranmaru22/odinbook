@@ -14,6 +14,11 @@ mixin friend(user, isRequest=false)
           unless user.equals(locals.currentUser._id)
             if locals.currentUser.friends.indexOf(user._id) !== -1
               span.tag.is-success.ml-5 Friend
+              // Friend request form
+              form.is-inline(action="/user/" + user._id, method="POST")
+                input(type="hidden", name="_method", value="PATCH")
+                input(type="hidden", name="_query", value="unfriend")
+                button.link-button.tag.is-danger.is-light.ml-5(type="submit") Unfriend
             else if locals.currentUser.sentFriendRequests.indexOf(user._id) !== -1 || locals.currentUser.recvFriendRequests.indexOf(user._id) !== -1
              span.tag.is-link.ml-5 Pending friend request
             else
