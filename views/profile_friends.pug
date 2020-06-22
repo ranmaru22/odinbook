@@ -1,16 +1,15 @@
 extends profile_layout
 
 block profileContent
-  .level
-    if user.equals(locals.currentUser._id) && user.recvFriendRequests.length > 0
-      .container
-        h2.title.is-4 Friend Requests
-        for friendRequest in user.recvFriendRequests
-          +friend(friendRequest, true)
+  if user.equals(locals.currentUser._id) && user.recvFriendRequests.length > 0
+    h2.title.is-4 Friend Requests
+    ul
+      for friendRequest in user.recvFriendRequests
+        +friend(friendRequest, true)
 
-    .container.mt-6
-      h2.title.is-4 Friends
-      for friend, index in user.friends
-        +friend(friend)
-      else
-        p No friends yet. :(
+  h2.title.is-4 Friends
+  ul
+    for friend, index in user.friends
+      +friend(friend)
+    else
+      p No friends yet. :(

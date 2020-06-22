@@ -6,35 +6,38 @@ block content
 
   unless notFound
 
-    h1.title #{user.name}
-      unless user.equals(locals.currentUser._id)
-        if friendStatus === "friend"
-          span.tag.is-success.ml-5 Friend
-        else if friendStatus === "pending"
-         span.tag.is-link.ml-5 Pending friend request
-        else
-          // Friend request form
-          form.is-inline(action="/user/" + user._id, method="POST")
-            input(type="hidden", name="_method", value="PATCH")
-            input(type="hidden", name="_query", value="sendFriendRequest")
-            button.link-button.tag.is-link.is-light.ml-5(type="submit") Add as friend
-      else
-        span.tag.is-primary.ml-5 You
-
-    if profile.status
-      h2.subtitle #{profile.status}
-
     .section.columns
       .column.profileInfo.is-one-quarter
+
+        nav.panel
+          h1.title.panel-heading #{user.name}
+            unless user.equals(locals.currentUser._id)
+              if friendStatus === "friend"
+                span.tag.is-success.is-pulled-right.ml-5 Friend
+              else if friendStatus === "pending"
+               span.tag.is-link.is-pulled-right.ml-5 Pending friend request
+              else
+                // Friend request form
+                form.is-inline(action="/user/" + user._id, method="POST")
+                  input(type="hidden", name="_method", value="PATCH")
+                  input(type="hidden", name="_query", value="sendFriendRequest")
+                  button.link-button.tag.is-link.is-light.is-pulled-right.ml-5(type="submit") Add as friend
+            else
+              span.tag.is-primary.is-pulled-right.ml-5 You
+
+        if profile.status
+          h2.subtitle.panel-block.has-text-centered #{profile.status}
+
         if user.picture
-          img.mb-4(src=user.picture, alt="Profile Picture")
+          .panel-block
+            img.mb-4(src=user.picture, alt="Profile Picture")
         if user.equals(locals.currentUser._id) && user.recvFriendRequests.length > 0
-          p
+          p.panel-block
             a.has-text-weight-bold(href="/user/" + user._id + "/friends") #{user.recvFriendRequests.length} new friend request#{user.recvFriendRequests.length === 1 ? "" : "s" }
-        p
+        p.panel-block
           a(href="/user/" + user._id + "/friends") #{user.friends.length} friend#{user.friends.length === 1 ? "" : "s" }
 
-      .column.posts
+      .column
         block profileContent
 
   else

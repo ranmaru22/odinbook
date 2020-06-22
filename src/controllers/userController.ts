@@ -222,8 +222,8 @@ export default abstract class UserController {
     private static async profileGetFriends(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.params.id)
-                .populate({ path: "friends", select: "name" })
-                .populate({ path: "recvFriendRequests" })
+                .populate({ path: "friends", select: [ "name", "picture" ] })
+                .populate({ path: "recvFriendRequests", select: [ "name", "picture" ] })
                 .exec();
             if (!user) {
                 res.status(404).render("profile", { notFound: true });

@@ -1,18 +1,37 @@
-mixin friend(friend, isRequest=false)
-  .level-item.box
-    p
-      a(href=friend.url) #{friend.name}
-    if isRequest
-      +requestWrapper(friend)
-
+mixin friend(user, isRequest=false)
+  li.is-clearfix.my-2
+    .level.box
+      .level-left
+        if user.picture
+          figure.image.is-64x64.is-pulled-left.mr-3
+            img.is-avatar-64(src=user.picture, alt=(user.name + "'s Avatar"))
+        p.subtitle
+          a(href=user.url) #{user.name}
+      .level-right
+        if isRequest
+          +requestWrapper(user)
+        else
+          unless user.equals(locals.currentUser._id)
+            if locals.currentUser.friends.indexOf(user._id) !== -1
+              span.tag.is-success.ml-5 Friend
+            else if locals.currentUser.sentFriendRequests.indexOf(user._id) !== -1 || locals.currentUser.recvFriendRequests.indexOf(user._id) !== -1
+             span.tag.is-link.ml-5 Pending friend request
+            else
+              // Friend request form
+              form.is-inline(action="/user/" + user._id, method="POST")
+                input(type="hidden", name="_method", value="PATCH")
+                input(type="hidden", name="_query", value="sendFriendRequest")
+                button.link-button.tag.is-link.is-light.ml-5(type="submit") Add as friend
+          else
+            span.tag.is-primary.ml-5 You
 
 mixin requestWrapper(friend)
   .container.has-text-centered.mt-4
     form.is-inline(action="/user/" + friend._id, method="POST")
       input(type="hidden", name="_method", value="PATCH")
       input(type="hidden", name="_query", value="acceptFriendRequest")
-      button.button.is-small.link-button.has-text-grey.ml-2(type="submit") Accept
+      button.button.is-small.link-button.has-text-success.ml-2(type="submit") Accept
     form.is-inline(action="/user/" + friend._id, method="POST")
       input(type="hidden", name="_method", value="PATCH")
       input(type="hidden", name="_query", value="declineFriendRequest")
-      button.button.is-small.link-button.has-text-grey.ml-2(type="submit") Decline
+      button.button.is-small.link-button.has-text-danger.ml-2(type="submit") Decline

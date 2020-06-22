@@ -1,34 +1,13 @@
 extends layout
+include _friends
 
 block content
-  h1.title User List
   .section
-    ul
-      - users.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
-      for user in users
-        +user(user)
+    h1.title User List
+    .section
+      ul
+        - users.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+        for user in users
+          +friend(user)
 
 
-mixin user(user)
-  li.is-clearfix.my-2
-    .level.box
-      .level-left
-        if user.picture
-          figure.image.is-64x64.is-pulled-left.mr-3
-            img.is-avatar-64(src=user.picture, alt=(user.name + "'s Avatar"))
-        p.subtitle
-          a(href=user.url) #{user.name}
-      .level-right
-        unless user.equals(locals.currentUser._id)
-          if locals.currentUser.friends.indexOf(user._id) !== -1
-            span.tag.is-success.ml-5 Friend
-          else if locals.currentUser.sentFriendRequests.indexOf(user._id) !== -1 || locals.currentUser.recvFriendRequests.indexOf(user._id) !== -1
-           span.tag.is-link.ml-5 Pending friend request
-          else
-            // Friend request form
-            form.is-inline(action="/user/" + user._id, method="POST")
-              input(type="hidden", name="_method", value="PATCH")
-              input(type="hidden", name="_query", value="sendFriendRequest")
-              button.link-button.tag.is-link.is-light.ml-5(type="submit") Add as friend
-        else
-          span.tag.is-primary.ml-5 You
